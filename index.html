@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>اليوم العالمي للضمير | ضميرك دليلك </title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Stinger';
+            src: url('./STINGER-STINGER-FIT-BOLD-TRIAL.TTF') format('truetype');
+            font-weight: bold;
+            /* السحر هنا: إجبار الخط على تجاهل الأرقام بالكامل ليتم استخدام خط تاجوال الأنيق للأرقام دائماً */
+            unicode-range: U+0000-002F, U+003A-065F, U+066A-FFFF;
+        }
+
+        :root {
+            --primary: #00647f;
+            --evil: #000000;
+            --primary-light: #e6f2f5;
+            --white: #ffffff;
+            --off-white: #f7f9fa;
+            --text-dark: #050b14;
+            --text-gray: #667380;
+            --nav-height: 80px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @media (pointer: fine) { body { cursor: none; } }
+
+        html.lenis { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto; }
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+        .lenis.lenis-stopped { overflow: hidden; }
+
+        body {
+            background-color: var(--white); color: var(--text-dark);
+            font-family: 'Tajawal', sans-serif; overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* تعديل الخطوط عند تحويل اللغة للإنجليزية */
+        html[lang="en"] body { font-family: 'Stinger', 'Tajawal', sans-serif; letter-spacing: 1px; }
+        html[lang="en"] .word-split { padding: 0.1em 0; margin: -0.1em 0; }
+
+        /* --- تأثير النسيج السينمائي --- */
+        .noise-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 999999; opacity: 0.04;
+            background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+        }
+
+        /* --- الماوس العاكس --- */
+        .cursor-dot {
+            position: fixed; top: 0; left: 0; width: 8px; height: 8px;
+            background: var(--white); border-radius: 50%;
+            pointer-events: none; z-index: 100000; transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+        }
+        .cursor-follower {
+            position: fixed; top: 0; left: 0; width: 40px; height: 40px;
+            border: 1.5px solid rgba(255, 255, 255, 1); border-radius: 50%;
+            pointer-events: none; z-index: 99999; transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+            mix-blend-mode: difference;
+        }
+        @media (pointer: coarse) { .cursor-dot, .cursor-follower { display: none !important; } }
+
+        /* --- شاشة التحميل --- */
+        .loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: var(--white); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000000;
+        }
+        .loader-percent {
+            font-family: 'Tajawal', sans-serif; font-weight: 900; font-size: clamp(6rem, 20vw, 15rem); line-height: 1; margin-bottom: 10px;
+            color: transparent; -webkit-text-stroke: 2px rgba(0, 100, 127, 0.15); 
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M 0,100 C 50,70 150,130 200,100 L 200,200 L 0,200 Z" fill="%2300647f"/></svg>');
+            background-size: 300px 200%; background-repeat: repeat-x; background-position: 0px 0%; 
+            -webkit-background-clip: text; background-clip: text; will-change: background-position;
+        }
+        html[lang="en"] .loader-percent { font-size: clamp(4rem, 12vw, 10rem); } 
+
+        .loader-text { font-family: 'Stinger', 'Tajawal', sans-serif; font-size: clamp(1.2rem, 3vw, 2.2rem); color: var(--primary); overflow: hidden; letter-spacing: 5px; text-transform: uppercase;}
+        .loader-text span { display: inline-block; transform: translateY(100%); }
+
+        /* --- شريط الملاحة --- */
+        nav {
+            position: fixed; top: 0; width: 100%; height: var(--nav-height); padding: 0 4vw;
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000; 
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0,0,0,0.05); transition: background 0.4s ease, border-color 0.4s ease;
+        }
+        
+        .nav-brand { display: flex; align-items: center; gap: clamp(30px, 5vw, 50px); }
+        
+        .nav-logo img, .un-logo img { height: clamp(35px, 4vw, 45px); transition: filter 0.4s ease, transform 0.3s ease; }
+        .nav-logo:hover img, .un-logo:hover img { transform: scale(1.05); }
+        
+        .lang-toggle {
+            font-family: 'Stinger', sans-serif; font-size: clamp(1rem, 2vw, 1.2rem); color: var(--primary);
+            text-decoration: none; padding: 8px 15px; border: 1.5px solid var(--primary); border-radius: 50px;
+            transition: all 0.3s ease; text-transform: uppercase;
+        }
+        .lang-toggle:hover { background: var(--primary); color: var(--white); }
+
+        nav.nav-dark { background: rgba(5, 11, 20, 0.9); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        nav.nav-dark .nav-logo img, nav.nav-dark .un-logo img { filter: brightness(0) invert(1); }
+        nav.nav-dark .lang-toggle { color: var(--white); border-color: var(--white); }
+        nav.nav-dark .lang-toggle:hover { background: var(--white); color: var(--evil); }
+
+        /* --- الهيرو --- */
+        .zoom-hero {
+            height: 100vh; position: relative; background: var(--off-white);
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+            margin-top: calc(var(--nav-height) / -2); 
+        }
+        .zoom-text {
+            font-family: 'Stinger', 'Tajawal', sans-serif; font-size: clamp(5rem, 15vw, 12rem); color: var(--primary);
+            line-height: 1.2; text-transform: uppercase; white-space: nowrap;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); transform-origin: center center;
+        }
+        html[lang="en"] .zoom-text { font-size: clamp(3rem, 9vw, 8rem); letter-spacing: 2px; }
+
+        .scroll-indicator {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            font-family: 'Stinger', sans-serif; font-size: 0.9rem; color: var(--primary); letter-spacing: 3px; 
+            animation: bounce 2s infinite; z-index: 10; text-transform: uppercase;
+        }
+        @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(15px); } }
+
+        /* --- شريط النصوص اللانهائي --- */
+        .marquee-container { width: 100%; background: var(--evil); color: var(--white); padding: 15px 0; overflow: hidden; white-space: nowrap; display: flex; align-items: center; border-top: 2px solid var(--primary); }
+        .marquee-content { display: inline-block; font-family: 'Stinger', 'Tajawal', sans-serif; font-size: clamp(1.2rem, 3vw, 2rem); letter-spacing: 3px; animation: marquee 30s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        html[lang="en"] .marquee-content { animation: marquee-en 30s linear infinite; }
+        @keyframes marquee-en { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+
+        /* --- الأقسام العامة المتجاوبة --- */
+        .mission-section { padding: 15vw 5vw; position: relative; background: var(--white); overflow: hidden; text-align: center;}
+        .mission-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 0 15px;}
+        .mission-title { font-family: 'Stinger', 'Tajawal', sans-serif; font-size: clamp(2rem, 5vw, 4rem); color: var(--primary); margin-bottom: 20px; line-height: 1.4; text-transform: uppercase;}
+        .mission-desc { font-size: clamp(1.1rem, 2vw, 1.6rem); line-height: 1.8; color: var(--text-dark); font-weight: 300; }
+        .word-split { display: inline-block; overflow: hidden; padding: 0.2em 0; margin: -0.2em 0; }
+        .word-split span { display: inline-block; transform: translateY(100%); }
+
+        /* --- قسم الفلسفة --- */
+        .philosophy-section { padding: 15vw 5vw; background: var(--white); position: relative; border-top: 1px solid rgba(0,0,0,0.05); overflow: hidden; }
+        .phil-bg-eye { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; height: 80%; background-image: url('./العين ش.png'); background-size: contain; background-position: center; background-repeat: no-repeat; opacity: 0.04; z-index: 0; pointer-events: none; }
+        
+        .phil-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 8vw, 80px); align-items: start; position: relative; z-index: 1; }
+        .phil-heading { font-family: 'Stinger', 'Tajawal', sans-serif; font-size: clamp(2rem, 4vw, 3.2rem); color: var(--text-dark); line-height: 1.4; position: sticky; top: calc(var(--nav-height) + 20px); text-transform: uppercase;}
+        .phil-heading span { color: var(--primary); }
+        .phil-content { display: flex; flex-direction: column; gap: clamp(40px, 8vw, 80px); }
+        .phil-block h3 { font-family: 'Tajawal', sans-serif; font-size: clamp(1.5rem, 3vw, 1.8rem); font-weight: 700; color: var(--primary); margin-bottom: 20px; }
+        .phil-block p { font-size: clamp(1rem, 2vw, 1.2rem); line-height: 1.8; color: var(--text-gray); }
+
+        .tide-visualization { width: 100%; height: clamp(120px, 20vw, 200px); background: var(--evil); margin-top: 40px; border-radius: 15px; overflow: hidden; position: relative; }
+        .tide-level { position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background: var(--primary); transition: height 0.1s linear; }
+        .tide-wave { position: absolute; top: -19px; left: 0; width: 200%; height: 20px; background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 20" xmlns="http://www.w3.org/2000/svg"><path d="M0,10 C15,0 35,20 50,10 C65,0 85,20 100,10 L100,20 L0,20 Z" fill="%2300647f"/></svg>'); background-size: 50% 20px; animation: wave 3s linear infinite; }
+        @keyframes wave { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .tide-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Stinger', 'Tajawal', sans-serif; font-size: clamp(1rem, 2.5vw, 1.2rem); color: white; z-index: 1; mix-blend-mode: difference; text-transform: uppercase; white-space: nowrap;}
+
+        .philosophy-quote { font-size: clamp(1.1rem, 2.5vw, 1.4rem); font-style: italic; font-weight: 300; color: var(--primary); line-height: 1.8; padding: 0 20px; border-inline-start: 4px solid var(--primary); margin-top: 20px; }
+
+        /* --- قسم التاريخ --- */
+        .history-section { display: flex; flex-direction: row; background: var(--off-white); position: relative; border-top: 1px solid rgba(0,0,0,0.05); }
+        .history-left { width: 50%; height: 100vh; position: sticky; top: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 5vw; background: var(--primary); color: var(--white); z-index: 2; }
+        .history-left h2 { font-family: 'Stinger', 'Tajawal', sans-serif; font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.3; text-transform: uppercase;}
+        
+        .history-right { width: 50%; padding: 10vh 5vw; display: flex; flex-direction: column; gap: 10vh; position: relative; overflow: hidden; }
+        .history-bg-images { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: hidden; }
+        .hist-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; filter: grayscale(1) brightness(0.4); transform: scale(1.1); transition: opacity 0.8s ease; }
+
+        .story-block { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px); padding: clamp(20px, 4vw, 30px); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); transition: transform 0.4s ease; position: relative; z-index: 1; }
+        .story-block:hover { transform: translateY(-10px); }
+        .story-img-container { width: 100%; height: clamp(200px, 35vh, 350px); border-radius: 15px; overflow: hidden; margin-bottom: 20px; position: relative; }
+        .story-img-container img { width: 100%; height: 140%; object-fit: cover; position: absolute; top: -20%; filter: grayscale(0.3) contrast(1.1); transition: filter 0.5s ease; }
+        .story-block:hover .story-img-container img { filter: grayscale(0) contrast(1.1); }
+        .story-content { padding: 0 5px; }
+        .story-year { font-family: 'Tajawal', sans-serif; font-weight: 900; font-size: clamp(1.5rem, 3vw, 2rem); color: var(--primary); margin-bottom: 5px; }
+        .story-title { font-family: 'Stinger', 'Tajawal', sans-serif; font-size: clamp(1.5rem, 3vw, 2.2rem); margin-bottom: 10px; color: var(--text-dark); line-height: 1.4;}
+        .story-p { font-size: clamp(1rem, 2vw, 1.1rem); line-height: 1.8; color: var(--text-gray); }
+
+        @media (max-width: 900px) {
+            .history-section { flex-direction: column; }
+            .history-left { width: 100%; height: 40vh; position: relative; align-items: center; text-align: center; }
+            .history-right { width: 100%; padding: 5vh 5vw; gap: 5vh; }
+            .hist-img { display: none; }
+        }
+
+        /* --- القسم الديني المطوّر --- */
+        .religion-section { padding: 15vw 5vw; background: var(--off-white); position: relative; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .rel-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+        
+        .holy-block {
+            background: var(--white); padding: clamp(30px, 5vw, 60px); border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.04); text-align: center;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .holy-block:hover { transform: translateY(-5px); box-shadow: 0 30px 60px rgba(0,0,0,0.06); }
+        
+        .quote-prefix {
+            font-family: 'Tajawal', sans-serif; font-size: clamp(1rem, 2vw, 1.4rem);
+            color: var(--text-gray); margin-bottom: 20px; font-weight: 700;
+        }
+        
+        .quran-verse { 
+            font-family: 'Tajawal'; font-size: clamp(1.8rem, 4vw, 3.2rem); font-weight: 900; 
+            color: var(--primary); line-height: 1.6; 
+        }
+        
+        .hadith-quote { 
+            font-family: 'Tajawal'; font-size: clamp(1.3rem, 3vw, 2.2rem); 
+            color: var(--text-dark); font-weight: 500; line-height: 1.8;
+        }
+
+        /* التفسير باللغة الإنجليزية للآية والحديث */
+        .quran-explanation {
+            font-family: 'Tajawal', sans-serif; font-size: clamp(1.1rem, 2vw, 1.4rem);
+            color: var(--text-gray); font-weight: 500; line-height: 1.6;
+            margin-top: 25px; padding-top: 25px; border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        .quran-explanation:empty { display: none; } /* يختفي إذا كان فارغاً (في العربي) */
+
+        /* --- الفوتر --- */
+        footer { min-height: 100vh; background: var(--evil); color: var(--white); display: flex; flex-direction: column; justify-content: space-between; padding: 10vw 5vw 5vw; position: relative; overflow: hidden; }
+        .footer-top { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 40px; margin-bottom: 40px; flex-wrap: wrap; gap: 30px;}
+        .social-icons { display: flex; gap: 15px; }
+        .social-link { width: 45px; height: 45px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; color: var(--white); }
+        .social-link:hover { background: var(--white); color: var(--evil); transform: translateY(-5px); }
+        .social-link svg { width: 18px; height: 18px; fill: currentColor; }
+        .footer-logo img { height: clamp(40px, 5vw, 50px); filter: brightness(0) invert(1); }
+        .cta-wrapper { width: 100%; display: flex; justify-content: center; margin: 20px 0 60px; }
+        .cta-button { display: inline-block; padding: clamp(15px, 3vw, 25px) clamp(30px, 5vw, 60px); font-family: 'Stinger', 'Tajawal', sans-serif; font-size: clamp(1.2rem, 3vw, 2rem); color: var(--white); border: 1px solid rgba(255,255,255,0.3); border-radius: 100px; position: relative; overflow: hidden; transition: color 0.4s ease; text-decoration: none; text-transform: uppercase;}
+        .cta-button::before { content: ''; position: absolute; top: 100%; left: 0; width: 100%; height: 100%; background: var(--primary); border-radius: 50% 50% 0 0; transition: top 0.5s cubic-bezier(0.19, 1, 0.22, 1), border-radius 0.5s; z-index: -1; }
+        .cta-button:hover::before { top: 0; border-radius: 0; }
+        .cta-button:hover { color: var(--white); border-color: transparent; }
+        .footer-credits { font-family: 'Tajawal', sans-serif; font-weight: 700; font-size: clamp(0.8rem, 2vw, 1rem); letter-spacing: 2px; opacity: 0.6; line-height: 1.5; text-transform: uppercase;}
+        .footer-huge { font-family: 'Stinger', 'Tajawal', sans-serif; font-size: clamp(3rem, 12vw, 8rem); line-height: 1; color: var(--white); text-align: center; margin-top: auto; letter-spacing: clamp(0.2rem, 1vw, 1rem); opacity: 0.9; text-transform: uppercase;}
+
+        @media (max-width: 900px) {
+            .phil-grid { grid-template-columns: 1fr; }
+            .phil-heading { position: static; text-align: center;}
+            .footer-top { flex-direction: column; align-items: center; text-align: center; }
+            .footer-credits { text-align: center; }
+            .loader-percent { font-size: 30vw; }
+            .nav-brand { gap: 20px; } 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise-overlay"></div>
+    <div class="cursor-dot"></div>
+    <div class="cursor-follower"></div>
+
+    <div class="loader">
+        <div class="loader-percent" id="loader-counter">0%</div>
+        <div class="loader-text"><span id="load-word" data-i18n="loaderText">ضميرك دليلك</span></div>
+    </div>
+
+    <nav id="navbar">
+        <div class="nav-brand">
+            <a href="#" class="nav-logo hover-target">
+                <img src="لوقو الضمير.png" alt="شعار الضمير">
+            </a>
+            <a href="https://www.un.org" target="_blank" class="un-logo hover-target" title="موقع الأمم المتحدة">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/ee/UN_emblem_blue.svg" alt="شعار الأمم المتحدة">
+            </a>
+        </div>
+        <a href="#" id="lang-toggle" class="lang-toggle hover-target">EN</a>
+    </nav>
+
+    <section class="zoom-hero" id="hero-trigger">
+        <h1 class="zoom-text" id="zoom-text" data-i18n="heroText">الضمير</h1>
+        <div class="scroll-indicator" data-i18n="scrollDown">SCROLL DOWN</div>
+    </section>
+
+    <div class="marquee-container">
+        <div class="marquee-content" data-i18n="marquee">
+            اليوم العالمي للضمير • الخامس من ابريل  • اليقظة الأخلاقية • التسامح والسلام • اليوم العالمي للضمير • الخامس من ابريل • اليقظة الأخلاقية • التسامح والسلام •
+        </div>
+    </div>
+
+    <section class="mission-section">
+        <div class="mission-content">
+            <h2 class="mission-title split-title" data-i18n="missionTitle">رسالة الأمم المتحدة</h2>
+            <div class="mission-desc split-desc" data-i18n="missionDesc">
+                أعلنت الجمعية العامة للأمم المتحدةالخامس من ابريل يوماً عالمياً للضمير. ليست مجرد ذكرى، بل هي صرخة لإيقاظ اليقظة الأخلاقية في قلب كل إنسان، لبناء عالم يسوده التسامح والسلام بدلاً من الحروب والانقسام.
+            </div>
+        </div>
+    </section>
+
+    <section class="philosophy-section" id="philosophy">
+        <div class="phil-bg-eye"></div>
+        <div class="phil-grid">
+            <div class="phil-heading gs-fade" data-i18n="philHeading">فلسفة الحملة<br>بين <span>المد والجزر</span></div>
+            <div class="phil-content">
+                <div class="phil-block gs-fade">
+                    <h3 data-i18n="philSub1">صراع المد والجزر</h3>
+                    <p data-i18n="philDesc1">ترتبط هوية الحملة بحركة المد والجزر الأزلية. المد العالي يمثل طغيان الشر والخطر في العالم، بينما الجزر (انحسار الماء) يمثل الخير، السلام، وصفاء الضمير.</p>
+                    <div class="tide-visualization" id="tide-trigger">
+                        <div class="tide-text" data-i18n="tideText">الضمير في مواجهة الشر</div>
+                        <div class="tide-level" id="tide-visual">
+                            <div class="tide-wave"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="phil-block gs-fade">
+                    <div class="philosophy-quote" data-i18n="philQuote">
+                        "أن العين المبصرة هي الطريق للضمير، والضمير لا يبصر من العين، بل يكون الصور من القلب مما يجعله عين القلب للشخص."
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="history-section">
+        <div class="history-left">
+            <h2 class="split-title" data-i18n="histHeading">أصداء<br>تاريخية</h2>
+        </div>
+        <div class="history-right">
+            <div class="history-bg-images">
+                <div class="hist-img hist-img-1" style="background-image: url('./مسار_صورتك_1.jpg')"></div>
+                <div class="hist-img hist-img-2" style="background-image: url('./مسار_صورتك_2.jpg')"></div>
+                <div class="hist-img hist-img-3" style="background-image: url('./مسار_صورتك_3.jpg')"></div>
+            </div>
+
+            <div class="story-block gs-card" id="story-1">
+                <div class="story-img-container">
+                    <img src="./بوستر الموقع 1.jpg" alt="History 1" class="card-parallax-img">
+                </div>
+                <div class="story-content">
+                    <div class="story-year" data-i18n="hist1Year">01. القدم</div>
+                    <h3 class="story-title" data-i18n="hist1Title">حلف الفضول</h3>
+                    <p class="story-p" data-i18n="hist1Desc">أعظم وثيقة شرف في مكة قبل الإسلام، اجتمعت فيها القبائل لنصرة المظلوم ورد الحقوق، مجسدة أسمى درجات الضمير المجتمعي الفطري.</p>
+                </div>
+            </div>
+
+            <div class="story-block gs-card" id="story-2">
+                <div class="story-img-container">
+                    <img src="./بوستر الموقع 2.jpg" alt="History 2" class="card-parallax-img">
+                </div>
+                <div class="story-content">
+                    <div class="story-year" data-i18n="hist2Year">02. 1187</div>
+                    <h3 class="story-title" data-i18n="hist2Title">مروءة القادة</h3>
+                    <p class="story-p" data-i18n="hist2Desc">عند دخول القدس، سطر صلاح الدين درساً تاريخياً برفضه للانتقام. لقد برهن للعالم أن العفو وقت المقدرة هو أعظم انتصار للضمير البشري.</p>
+                </div>
+            </div>
+
+            <div class="story-block gs-card" id="story-3">
+                <div class="story-img-container">
+                    <img src="./بوستر للموقع 3.jpg" alt="History 3" class="card-parallax-img">
+                </div>
+                <div class="story-content">
+                    <div class="story-year" data-i18n="hist3Year">03. 1990</div>
+                    <h3 class="story-title" data-i18n="hist3Title">إرث مانديلا</h3>
+                    <p class="story-p" data-i18n="hist3Desc">خرج من زنزانته بعد 27 عاماً، وبدلاً من تدمير من ظلموه، اختار المصالحة، لينقذ أمة بأكملها بقوة التسامح ويقظة الضمير.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="religion-section">
+        <div class="rel-content">
+            
+            <div class="holy-block gs-fade-up">
+                <div class="quote-prefix" data-i18n="religionPrefix1">قال تعالى:</div>
+                <div class="quran-verse" data-i18n="religion1">﴿ وَلَا أُقْسِمُ بِالنَّفْسِ اللَّوَّامَةِ ﴾</div>
+                <div class="quran-explanation" data-i18n="religion1Exp"></div>
+            </div>
+
+            <div class="holy-block gs-fade-up">
+                <div class="quote-prefix" data-i18n="religionPrefix2">وقال النبي ﷺ:</div>
+                <div class="hadith-quote" data-i18n="religion2">« الْبِرُّ حُسْنُ الْخُلُقِ، وَالإِثْمُ مَا حَاكَ فِي صَدْرِكَ، وَكَرِهْتَ أَنْ يَطَّلِعَ عَلَيْهِ النَّاسُ »</div>
+                <div class="quran-explanation" data-i18n="religion2Exp"></div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer id="footer-section">
+        <div class="cta-wrapper">
+            <a href="#" class="cta-button hover-target" data-i18n="ctaButton">شارك في المبادرة</a>
+        </div>
+        <div class="footer-top">
+            <div class="footer-logo">
+                <img src="لوقو الضمير.png" alt="الضمير">
+            </div>
+            <div class="social-icons">
+                <a href="https://www.behance.net/yousef-1" class="social-link hover-target" title="Behance"><svg viewBox="0 0 24 24"><path d="M22 7h-7v-2h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 5.464 2.106 5.464 5.864 0 .333-.038.706-.089 1.09h-8.083c.27 1.488 1.442 2.502 2.973 2.502 1.09 0 2.052-.455 2.531-1.399h2.383v.538zm-1.896-3.486c-.19-1.229-1.12-2.186-2.434-2.186-1.264 0-2.316.892-2.585 2.186h5.019zm-10.222 2.986h-5.263v-3.766h5.132c1.077 0 2.222-.44 2.222-1.95 0-1.503-1.144-1.967-2.22-1.967h-4.871v-4.136h4.523c.961 0 2.261.325 2.261 1.77 0 1.258-1.074 1.637-1.87 1.745v.068c.843.084 2.155.452 2.155 1.954 0 1.545-1.233 2.106-2.164 2.106v4.176h-.061c.026 0 .093 0 .156 0zm-5.263-8.879v3.088h4.536c.61 0 1.232-.239 1.232-1.011 0-.916-.761-1.066-1.527-1.066h-4.241zm0 4.14v3.666h4.721c.883 0 1.533-.314 1.533-1.177 0-1.141-.837-1.479-1.848-1.479h-4.406z"/></svg></a>
+                <a href="https://www.instagram.com/dmerkdlelk?igsh=MWxkMXBxMjFyYmM3MA==" class="social-link hover-target" title="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 1.76-6.98 6.279-.059 1.28-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.515 2.616 6.079 6.98 6.28 1.28.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.368-.2 6.78-1.76 6.98-6.28.058-1.28.072-1.689.072-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.518-2.616-6.079-6.98-6.279-1.28-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+            </div>
+            <div class="footer-credits" data-i18n="footerCredits">DESIGNED BY yousef <br> 05 APRIL 2026</div>
+        </div>
+        <div class="footer-huge">CONSCIENCE</div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+
+    <script>
+        /* =========================================
+           1. نظام الترجمة المتقدم (i18n System)
+           ========================================= */
+        const translations = {
+            ar: {
+                loaderText: "ضميرك دليلك",
+                heroText: "الضمير",
+                scrollDown: "SCROLL DOWN",
+                marquee: "اليوم العالمي للضمير • الخامس من ابريل • اليقظة الأخلاقية • التسامح والسلام • اليوم العالمي للضمير • الخامي من ابريل • اليقظة الأخلاقية • التسامح والسلام •",
+                missionTitle: "رسالة الأمم المتحدة",
+                missionDesc: "أعلنت الجمعية العامة للأمم المتحدة يوم 5 أبريل يوماً عالمياً للضمير. ليست مجرد ذكرى، بل هي صرخة لإيقاظ اليقظة الأخلاقية في قلب كل إنسان، لبناء عالم يسوده التسامح والسلام بدلاً من الحروب والانقسام.",
+                philHeading: "فلسفة الحملة<br>بين <span>المد والجزر</span>",
+                philSub1: "صراع المد والجزر",
+                philDesc1: "ترتبط هوية الحملة بحركة المد والجزر الأزلية. المد العالي يمثل طغيان الشر والخطر في العالم، بينما الجزر (انحسار الماء) يمثل الخير، السلام، وصفاء الضمير.",
+                tideText: "الضمير في مواجهة الشر",
+                philQuote: `"أن العين المبصرة هي الطريق للضمير، والضمير لا يبصر من العين، بل يكون الصور من القلب مما يجعله عين القلب للشخص."`,
+                histHeading: "أصداء<br>تاريخية",
+                hist1Year: "01. القدم",
+                hist1Title: "حلف الفضول",
+                hist1Desc: "أعظم وثيقة شرف في مكة قبل الإسلام، اجتمعت فيها القبائل لنصرة المظلوم ورد الحقوق، مجسدة أسمى درجات الضمير المجتمعي الفطري.",
+                hist2Year: "02. 1187",
+                hist2Title: "مروءة القادة",
+                hist2Desc: "عند دخول القدس، سطر صلاح الدين درساً تاريخياً برفضه للانتقام. لقد برهن للعالم أن العفو وقت المقدرة هو أعظم انتصار للضمير البشري.",
+                hist3Year: "03. 1990",
+                hist3Title: "إرث مانديلا",
+                hist3Desc: "خرج من زنزانته بعد 27 عاماً، وبدلاً من تدمير من ظلموه، اختار المصالحة، لينقذ أمة بأكملها بقوة التسامح ويقظة الضمير.",
+                
+                /* الترجمة الدينية العربية (الآيات لا تُترجم) */
+                religionPrefix1: "قال تعالى:",
+                religion1: "﴿ وَلَا أُقْسِمُ بِالنَّفْسِ اللَّوَّامَةِ ﴾",
+                religion1Exp: "", /* فارغ في العربي */
+                religionPrefix2: "وقال النبي ﷺ:",
+                religion2: "« الْبِرُّ حُسْنُ الْخُلُقِ، وَالإِثْمُ مَا حَاكَ فِي صَدْرِكَ، وَكَرِهْتَ أَنْ يَطَّلِعَ عَلَيْهِ النَّاسُ »",
+                religion2Exp: "",
+                
+                ctaButton: "شارك في المبادرة",
+                footerCredits: "DESIGNED BY yousef <br> 05 APRIL 2026"
+            },
+            en: {
+                loaderText: "CONSCIENCE IS YOUR GUIDE",
+                heroText: "CONSCIENCE",
+                scrollDown: "SCROLL DOWN",
+                marquee: "INTERNATIONAL DAY OF CONSCIENCE • 05 APRIL • MORAL AWAKENING • PEACE & TOLERANCE • INTERNATIONAL DAY OF CONSCIENCE • 05 APRIL •",
+                missionTitle: "UNITED NATIONS MISSION",
+                missionDesc: "The UN General Assembly declared April 5 as the International Day of Conscience. It is not merely a memorial, but a cry to awaken moral vigilance in every human heart, building a world of tolerance and peace instead of war and division.",
+                philHeading: "CAMPAIGN PHILOSOPHY<br>EBB <span>& FLOW</span>",
+                philSub1: "The Struggle of Tides",
+                philDesc1: "The campaign's identity is tied to the eternal motion of tides. High tide represents the overwhelming evil and danger in the world, while ebb (receding water) represents goodness, peace, and clarity of conscience.",
+                tideText: "CONSCIENCE VS. EVIL",
+                philQuote: `"The seeing eye is the path to conscience, and conscience does not see from the eye, but forms images from the heart, making it the eye of the heart for a person."`,
+                histHeading: "HISTORICAL<br>ECHOES",
+                hist1Year: "01. ANCIENT",
+                hist1Title: "Hilf al-Fudul",
+                hist1Desc: "The greatest pact of honor in pre-Islamic Mecca, where tribes gathered to support the oppressed and restore rights, embodying the highest degrees of innate societal conscience.",
+                hist2Year: "02. 1187",
+                hist2Title: "Chivalry of Leaders",
+                hist2Desc: "Upon entering Jerusalem, Saladin wrote a historical lesson by refusing revenge. He proved to the world that forgiveness when capable is the greatest victory of human conscience.",
+                hist3Year: "03. 1990",
+                hist3Title: "Mandela's Legacy",
+                hist3Desc: "He emerged from his cell after 27 years, and instead of destroying those who wronged him, he chose reconciliation, saving an entire nation through the power of tolerance and an awakened conscience.",
+                
+                /* الترجمة الدينية الإنجليزية (النص القرآني يبقى بالعربي مع توضيح أسفله) */
+                religionPrefix1: "The Almighty says in the Holy Quran:",
+                religion1: " وَلَا أُقْسِمُ بِالنَّفْسِ اللَّوَّامَةِ ",
+                religion1Exp: "“Nay, I swear by the reproaching soul.”<br><span style='font-size:0.9em; opacity:0.8;'>This verse highlights the immense value of the self-reproaching conscience.</span>",
+                religionPrefix2: "The Prophet Muhammad (PBUH) said:",
+                religion2: "« الْبِرُّ حُسْنُ الْخُلُقِ، وَالإِثْمُ مَا حَاكَ فِي صَدْرِكَ، وَكَرِهْتَ أَنْ يَطَّلِعَ عَلَيْهِ النَّاسُ »",
+                religion2Exp: "“Righteousness is good character, and sin is that which wavers in your heart and which you do not want people to know about.”",
+                
+                ctaButton: "JOIN THE INITIATIVE",
+                footerCredits: "DESIGNED BY yousef <br> 05 APRIL 2026"
+            }
+        };
+
+        let currentLang = sessionStorage.getItem('siteLang') || 'ar'; 
+        const htmlRoot = document.getElementById('html-root');
+        const langToggleBtn = document.getElementById('lang-toggle');
+
+        function applyLanguage(lang) {
+            htmlRoot.setAttribute('lang', lang);
+            htmlRoot.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            langToggleBtn.innerText = lang === 'ar' ? 'EN' : 'AR';
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+        }
+
+        applyLanguage(currentLang);
+
+        langToggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const newLang = currentLang === 'ar' ? 'en' : 'ar';
+            sessionStorage.setItem('siteLang', newLang); 
+            window.location.reload(); 
+        });
+
+        /* =========================================
+           2. دوال التقطيع وأنيميشن GSAP
+           ========================================= */
+        function splitTextIntoSpans(selector) {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                if(el.querySelector('br') || el.querySelector('span:not(.word-split)')) return;
+                const words = el.innerText.split(' ');
+                el.innerHTML = '';
+                words.forEach(word => {
+                    const wordWrap = document.createElement('div');
+                    wordWrap.className = 'word-split';
+                    const span = document.createElement('span');
+                    span.innerText = word + '\u00A0';
+                    wordWrap.appendChild(span);
+                    el.appendChild(wordWrap);
+                });
+            });
+        }
+        splitTextIntoSpans('.split-title');
+        splitTextIntoSpans('.split-desc');
+
+        const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smooth: true });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        requestAnimationFrame(raf);
+        gsap.registerPlugin(ScrollTrigger);
+
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorFollower = document.querySelector('.cursor-follower');
+        
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(cursorDot, { x: e.clientX, y: e.clientY, duration: 0.1 });
+            gsap.to(cursorFollower, { x: e.clientX, y: e.clientY, duration: 0.3 });
+        });
+
+        document.querySelectorAll('a, button, .hover-target').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorFollower.style.width = '60px'; cursorFollower.style.height = '60px'; cursorFollower.style.backgroundColor = 'var(--white)'; cursorFollower.style.borderColor = 'transparent';
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(el, { x: 0, y: 0, duration: 0.5, ease: "power3.out" });
+                cursorFollower.style.width = '40px'; cursorFollower.style.height = '40px'; cursorFollower.style.backgroundColor = 'transparent'; cursorFollower.style.borderColor = 'rgba(255,255,255,1)';
+            });
+        });
+
+        const tlLoader = gsap.timeline();
+        let counter = { value: 0 };
+        const loaderCounter = document.getElementById('loader-counter');
+        
+        let waveX = 0;
+        gsap.ticker.add(() => {
+            waveX -= 4; 
+            if (loaderCounter) loaderCounter.style.backgroundPosition = `${waveX}px ${100 - counter.value}%`;
+        });
+
+        tlLoader.to(counter, {
+            value: 100, duration: 2.5, ease: "power2.inOut",
+            onUpdate: function() { loaderCounter.innerText = Math.round(counter.value) + "%"; } 
+        })
+        .to("#load-word", { y: "-100%", opacity: 0, duration: 0.8, ease: "power4.in" }, "-=0.5")
+        .to(".loader", { yPercent: -100, duration: 1.2, ease: "expo.inOut" }, "+=0.2");
+
+        gsap.to("#zoom-text", { scrollTrigger: { trigger: "#hero-trigger", start: "top top", end: "+=200vh", pin: true, scrub: 1 }, scale: 80, opacity: 0, ease: "power2.in" });
+
+        gsap.utils.toArray('.split-title, .split-desc').forEach(element => {
+            const spans = element.querySelectorAll('.word-split span');
+            if(spans.length > 0) {
+                gsap.to(spans, { scrollTrigger: { trigger: element, start: "top 85%" }, y: 0, duration: 1, stagger: 0.03, ease: "power4.out" });
+            }
+        });
+
+        gsap.to("#tide-visual", { scrollTrigger: { trigger: "#tide-trigger", start: "top 70%", end: "bottom 30%", scrub: true }, height: "100%", ease: "none" });
+
+        gsap.utils.toArray('.gs-card').forEach((card) => {
+            const img = card.querySelector('.card-parallax-img');
+            gsap.from(card, { scrollTrigger: { trigger: card, start: "top 85%" }, y: 100, opacity: 0, duration: 1.2, ease: "power3.out" });
+            if(img) {
+                gsap.to(img, { scrollTrigger: { trigger: card, start: "top bottom", end: "bottom top", scrub: true }, y: "20%", ease: "none" });
+            }
+        });
+
+        gsap.utils.toArray('.gs-fade, .gs-fade-up').forEach(elem => {
+            gsap.from(elem, { scrollTrigger: { trigger: elem, start: "top 85%" }, y: 40, opacity: 0, duration: 1.2, ease: "power3.out" });
+        });
+
+        ScrollTrigger.create({
+            trigger: "#footer-section", start: "top 10%", end: "bottom top",
+            onEnter: () => document.querySelector("nav").classList.add("nav-dark"),
+            onLeaveBack: () => document.querySelector("nav").classList.remove("nav-dark")
+        });
+    </script>
+</body>
+</html>
